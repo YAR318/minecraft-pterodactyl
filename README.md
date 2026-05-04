@@ -1,10 +1,10 @@
-# 🎮 Pterodactyl & Minecraft Infrastructure
+#  Pterodactyl & Minecraft Infrastructure
 
 Repositorio de infraestructura para el despliegue de un panel **Pterodactyl** y servidores de **Minecraft** sobre Docker en un Droplet de DigitalOcean.
 
 ---
 
-## 🏗️ Arquitectura
+##  Arquitectura
 
 | Componente         | Tecnología              | Descripción                                   |
 |--------------------|-------------------------|-----------------------------------------------|
@@ -18,14 +18,14 @@ Repositorio de infraestructura para el despliegue de un panel **Pterodactyl** y 
 
 ---
 
-## 🌐 Acceso al Panel
+##  Acceso al Panel
 
 - **URL:** `https://panel.yeremi.work`
 - **Usuario admin:** `Maru`
 
 ---
 
-## 📂 Rutas Clave del Sistema
+##  Rutas Clave del Sistema
 
 ```
 /var/www/pterodactyl/          → Archivos del panel web
@@ -36,7 +36,7 @@ Repositorio de infraestructura para el despliegue de un panel **Pterodactyl** y 
 
 ---
 
-## 🌿 Flujo de Ramas (Git Flow)
+##  Flujo de Ramas (Git Flow)
 
 ```
 main          ← Producción (solo merges desde staging aprobados)
@@ -52,7 +52,7 @@ main          ← Producción (solo merges desde staging aprobados)
 
 ---
 
-## 🔥 Puertos Abiertos (Firewall UFW)
+##  Puertos Abiertos (Firewall UFW)
 
 | Puerto    | Protocolo | Uso                         |
 |-----------|-----------|-----------------------------|
@@ -64,9 +64,9 @@ main          ← Producción (solo merges desde staging aprobados)
 
 ---
 
-## 👥 Equipo
+##  Equipo
 
 | Desarrollador | Rama Git        | Rol            |
 |---------------|-----------------|----------------|
-| Yeremi Gomez  | `Dev-Yeremi`    | Lead / DevOps  |
+| Yeremi Gomez  | `Dev-Yeremi`    | Developer/DevOp|
 | Guillermo     | `Dev-Guillermo` | Developer      |
