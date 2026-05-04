@@ -63,10 +63,3 @@ main          ← Producción (solo merges desde staging aprobados)
 | `25565`   | TCP/UDP   | Minecraft (por defecto)     |
 
 ---
-
-##  Equipo
-
-| Desarrollador | Rama Git        | Rol            |
-|---------------|-----------------|----------------|
-| Yeremi Gomez  | `Dev-Yeremi`    | Developer/DevOp|
-| Guillermo     | `Dev-Guillermo` | Developer      |
