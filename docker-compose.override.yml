@@ -1,0 +1,32 @@
+# =============================================================
+# docker-compose.override.yml — Desarrollo Local
+# Se aplica automáticamente sobre docker-compose.yml
+# NO commitear datos sensibles aquí
+# =============================================================
+# Para usar en local:
+#   docker compose up -d
+# Para producción (ignorar este archivo):
+#   docker compose -f docker-compose.yml up -d
+# =============================================================
+
+version: "3.8"
+
+services:
+
+  nginx:
+    ports:
+      - "8000:80"   # Panel accesible en http://localhost:8000
+    volumes:
+      - ./config/nginx/panel.local.conf:/etc/nginx/conf.d/panel.conf:ro
+
+  panel:
+    environment:
+      APP_ENV: local
+      APP_URL: http://localhost:8000
+      APP_DEBUG: "true"
+      LOG_LEVEL: debug
+
+  wings:
+    ports:
+      - "8082:8080"
+      - "2022:2022"
