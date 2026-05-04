@@ -1,0 +1,44 @@
+# ==============================================
+# .gitignore - Pterodactyl & Minecraft Project
+# ==============================================
+
+# Secrets y variables de entorno
+.env
+*.env
+.env.*
+secrets/
+credentials/
+
+# Logs del sistema
+*.log
+logs/
+/var/log/
+
+# Archivos temporales y caché
+*.tmp
+*.cache
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Scripts de instalación descargados
+install.sh
+
+# Certificados SSL (nunca subir claves privadas)
+*.pem
+*.key
+*.crt
+*.p12
+
+# Docker volumes (datos de mundos de Minecraft - son pesados)
+volumes/
+/var/lib/pterodactyl/volumes/
+
+# Dependencias de Node (si se agregan herramientas de frontend)
+node_modules/
+npm-debug.log*
+
+# Backups
+*.bak
+backups/
