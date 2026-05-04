@@ -125,9 +125,8 @@ services:
     networks:
       - pterodactyl
     ports:
-      # ⚠️ Puerto 8080 ocupado por evolution_api (Hunabku)
-      # Wings expuesto en 8082 externamente → 8080 internamente
-      - "8082:8080"
+      # Wings API escucha en 8082 dentro del contenedor (configurado por panel)
+      - "8082:8082"
       - "2022:2022"
     tty: true
     environment:
