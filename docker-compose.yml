@@ -66,6 +66,8 @@ services:
       - panel_nginx:/etc/nginx/http.d/
       - panel_logs:/app/storage/logs
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Fix: deshabilita SSL en el cliente MySQL (evita error TLS en migraciones)
+      - ./config/panel/my.cnf:/root/.my.cnf:ro
     environment:
       # Aplicación
       APP_ENV: production
