@@ -25,6 +25,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE:-panel}
       MYSQL_USER: ${DB_USERNAME:-pterodactyl}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+    command: --require-secure-transport=0
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 30s
