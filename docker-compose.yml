@@ -1,0 +1,176 @@
+version: "3.8"
+
+# =============================================================
+# Pterodactyl Panel + Wings - Docker Compose (Producción)
+# Dominio: panel.yeremi.work
+# Repo: https://github.com/YAR318/minecraft-pterodactyl
+# =============================================================
+
+services:
+
+  # ──────────────────────────────────────────
+  # Base de datos
+  # ──────────────────────────────────────────
+  database:
+    image: mariadb:10.11
+    # ⚠️ Sin exposición externa — puerto 3306 solo en red interna pterodactyl
+    # (evita conflicto con hk-mysql del proyecto Hunabku)
+    container_name: pterodactyl_db
+    restart: unless-stopped
+    networks:
+      - pterodactyl
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE:-panel}
+      MYSQL_USER: ${DB_USERNAME:-pterodactyl}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────
+  # Cache y colas
+  # ──────────────────────────────────────────
+  cache:
+    image: redis:7-alpine
+    # ⚠️ Sin exposición externa — puerto 6379 solo en red interna pterodactyl
+    # (evita conflicto con hk-redis del proyecto Hunabku)
+    container_name: pterodactyl_cache
+    restart: unless-stopped
+    networks:
+      - pterodactyl
+    volumes:
+      - cache_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────
+  # Panel Pterodactyl (Laravel / PHP-FPM)
+  # ──────────────────────────────────────────
+  panel:
+    image: ghcr.io/pterodactyl/panel:latest
+    container_name: pterodactyl_panel
+    restart: unless-stopped
+    networks:
+      - pterodactyl
+    volumes:
+      - panel_var:/app/var/
+      - panel_nginx:/etc/nginx/http.d/
+      - panel_logs:/app/storage/logs
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    environment:
+      # Aplicación
+      APP_ENV: production
+      APP_URL: ${APP_URL:-https://panel.yeremi.work}
+      APP_TIMEZONE: ${APP_TIMEZONE:-UTC}
+      APP_SERVICE_AUTHOR: ${PANEL_ADMIN_EMAIL:-admin@yeremi.work}
+      TRUSTED_PROXIES: "*"
+      # Base de datos
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-panel}
+      DB_USERNAME: ${DB_USERNAME:-pterodactyl}
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Cache / Sesiones / Colas
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      # Correo (configurar después si se necesita)
+      MAIL_MAILER: ${MAIL_DRIVER:-log}
+      MAIL_FROM: ${MAIL_FROM:-admin@yeremi.work}
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+
+  # ──────────────────────────────────────────
+  # Nginx (Reverse proxy + SSL)
+  # ──────────────────────────────────────────
+  nginx:
+    image: nginx:stable-alpine
+    container_name: pterodactyl_nginx
+    restart: unless-stopped
+    networks:
+      - pterodactyl
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx/panel.conf:/etc/nginx/conf.d/panel.conf:ro
+      - panel_nginx:/var/pterodactyl/nginx:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - panel
+
+  # ──────────────────────────────────────────
+  # Wings (Daemon de servidores de juegos)
+  # ──────────────────────────────────────────
+  wings:
+    image: ghcr.io/pterodactyl/wings:latest
+    container_name: pterodactyl_wings
+    restart: unless-stopped
+    networks:
+      - pterodactyl
+    ports:
+      # ⚠️ Puerto 8080 ocupado por evolution_api (Hunabku)
+      # Wings expuesto en 8082 externamente → 8080 internamente
+      - "8082:8080"
+      - "2022:2022"
+    tty: true
+    environment:
+      TZ: ${APP_TIMEZONE:-UTC}
+      WINGS_UID: 988
+      WINGS_GID: 988
+      WINGS_USERNAME: pterodactyl
+    volumes:
+      # Socket de Docker del host (necesario para crear contenedores de MC)
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Configuración y datos de Wings
+      - /etc/pterodactyl:/etc/pterodactyl
+      - /var/lib/pterodactyl:/var/lib/pterodactyl
+      - /var/log/pterodactyl:/var/log/pterodactyl
+      - /tmp/pterodactyl:/tmp/pterodactyl
+      # Certificados SSL del host
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+    security_opt:
+      - no-new-privileges:false
+    depends_on:
+      - panel
+
+# ──────────────────────────────────────────
+# Redes
+# ──────────────────────────────────────────
+networks:
+  pterodactyl:
+    name: pterodactyl_network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ──────────────────────────────────────────
+# Volúmenes persistentes
+# ──────────────────────────────────────────
+volumes:
+  db_data:
+    driver: local
+  cache_data:
+    driver: local
+  panel_var:
+    driver: local
+  panel_nginx:
+    driver: local
+  panel_logs:
+    driver: local
