@@ -2,19 +2,21 @@
 # .gitignore - Pterodactyl & Minecraft Project
 # ==============================================
 
-# Secrets y variables de entorno
+# ── Secrets y variables de entorno ──────────
 .env
 *.env
 .env.*
 secrets/
 credentials/
 
-# Logs del sistema
+# ── Configuración real de Wings (tiene tokens) ──
+config/wings/config.yml
+
+# ── Logs ────────────────────────────────────
 *.log
 logs/
-/var/log/
 
-# Archivos temporales y caché
+# ── Archivos temporales y caché ─────────────
 *.tmp
 *.cache
 *.swp
@@ -22,23 +24,24 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Scripts de instalación descargados
+# ── Scripts de instalación descargados ──────
 install.sh
 
-# Certificados SSL (nunca subir claves privadas)
+# ── Certificados SSL ─────────────────────────
 *.pem
 *.key
 *.crt
 *.p12
 
-# Docker volumes (datos de mundos de Minecraft - son pesados)
+# ── Docker volumes locales ───────────────────
 volumes/
-/var/lib/pterodactyl/volumes/
+docker-volumes/
 
-# Dependencias de Node (si se agregan herramientas de frontend)
+# ── Dependencias ────────────────────────────
 node_modules/
 npm-debug.log*
+vendor/
 
-# Backups
+# ── Backups ──────────────────────────────────
 *.bak
 backups/
